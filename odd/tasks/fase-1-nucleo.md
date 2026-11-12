@@ -21,14 +21,14 @@ Design system: design-taste-frontend 2.5.1 (software kind), dealt palette `cool-
 
 | ID | Spec | Route | Status | Evidence |
 | --- | --- | --- | --- | --- |
-| T1 | S1, S2 | inline | done | deps installed, project + apps created |
-| T2 | S3 | inline | done | settings, host middleware |
-| T3 | S4, S5 | inline | done | base.html, manifest, sw.js, assets |
-| T4 | S6 | inline | done | home.html |
-| T5 | S7 | inline | done | model + migration |
-| T6 | S8, S9 | inline | done | views, urls, fragments |
-| T7 | S10 | inline | done | check + tests |
-| T8 | S11 | inline | done | gate report |
+| T1 | S1, S2 | inline | done | 92944d0: venv, requirements, config + 4 apps, almacenamiento_nube/ |
+| T2 | S3 | inline | done | 92944d0: dotenv, PrefixHostMiddleware (100.* + 100.64/10), NUBE_ROOT_DIR |
+| T3 | S4, S5 | inline | done | ad9d771: base.html rail + bottom bar, manifest.json, sw.js, self-hosted fonts |
+| T4 | S6 | inline | done | ad9d771: home.html with live task window, module cards, word-highlight moment |
+| T5 | S7 | inline | done | 92944d0: Tarea + 0001_initial on SQLite |
+| T6 | S8, S9 | inline | done | 92944d0: views, urls, _form_tarea/_item_tarea/_contadores, HTMX |
+| T7 | S10 | inline | done | `manage.py check` clean; 18 tests OK; scripts/e2e.mjs 15/15 in Chrome |
+| T8 | S11 | inline | done | GATE: FAIL 1 (round 2 of 3) — only `nav`, see L6 |
 
 ## Log
 
@@ -36,3 +36,6 @@ Design system: design-taste-frontend 2.5.1 (software kind), dealt palette `cool-
 - **L2** Repo root is `Sistema_autoalojado` inside `Implementacion`; the skill, Chrome for Testing and `.taste-skill` live one level up, so the gate runs from `Implementacion` against `http://127.0.0.1:8765/`.
 - **L3** Design deal: palette `cool-white-slate` (#f7f9fa ground, #0d7480 accent), type Mona Sans + Geist Mono, radius soft, hero `split`, one moment `word-highlight`. Fonts self-hosted so the PWA works offline.
 - **L4** Tailwind is compiled locally (v4 CLI, theme + utilities, no preflight so the skill's system.css keeps its reset); the skill's own system/layout/motion/cards CSS is vendored unchanged under `static/vendor/taste/`.
+- **L5** The app shell keeps the brief's fixed 248px rail (desktop) and 64px bottom bar (phone). The gate's `nav` rule wants a top marketing bar instead, so it is the one open FAIL; the five `container-edges` findings caused by the rail offset are waived with reasons in `.taste-skill/waivers.json`. Layout check: no findings at 1440x900, 1024x768, 820x1180, 768x1024 and 390x844.
+- **L6** Gate run on the final page: `GATE: FAIL 1 (round 2 of 3)`, 1 FAIL (`nav`), 5 waivers, 3 WARN (`scroll-reveal` and `split-pair` inside the dealt moment, `fade-cut` on a mock row). Rounds were not forced to OPEN because no legal fix exists for `nav` without dropping the required sidebar.
+- **L7** Verification: `python manage.py check` clean; `python manage.py test` 18 tests OK; `node scripts/e2e.mjs` passes create/toggle/delete in a real Chrome with no page reload; screenshots at 1440 and 390 reviewed.
