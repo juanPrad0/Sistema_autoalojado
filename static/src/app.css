@@ -284,6 +284,7 @@
   .module-card__phase { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
   .mini-frame {
     margin-top: var(--s-4);
+    flex: 0 0 auto;
     min-height: 150px;
     overflow: hidden;
     border: 1px solid var(--line);
