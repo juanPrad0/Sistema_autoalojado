@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Horarios · Panel personal{% endblock %}
+{% block description %}La semana en bloques de horario, cada bloque atado a las tareas que le tocan.{% endblock %}
+{% block main_class %}main--app{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <div class="stack-2">
+      <h1>Horarios</h1>
+      <p class="t-lead muted">La semana en bloques con hora de inicio y fin, cada uno con su color y sus tareas.</p>
+    </div>
+    <span class="chip-fase">Fase 2</span>
+  </div>
+
+  <div class="modulo-vacio mt-8">
+    <div class="mini-frame" data-visual>
+      <div class="mini">
+        <div class="mini__week">
+          <div class="mini__day{% if hoy.weekday == 0 %} mini__day--on{% endif %}">L<i></i></div>
+          <div class="mini__day{% if hoy.weekday == 1 %} mini__day--on{% endif %}">M<i></i></div>
+          <div class="mini__day{% if hoy.weekday == 2 %} mini__day--on{% endif %}">M<i></i></div>
+          <div class="mini__day{% if hoy.weekday == 3 %} mini__day--on{% endif %}">J<i></i></div>
+          <div class="mini__day{% if hoy.weekday == 4 %} mini__day--on{% endif %}">V<i></i></div>
+          <div class="mini__day{% if hoy.weekday == 5 %} mini__day--on{% endif %}">S<i></i></div>
+          <div class="mini__day{% if hoy.weekday == 6 %} mini__day--on{% endif %}">D<i></i></div>
+        </div>
+        <div class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Sin bloques cargados</div>
+      </div>
+    </div>
+    <p class="t-small muted">La Fase 2 agrega los bloques semanales con su relación a las tareas y la marca de completada desde el mismo bloque, sin salir del calendario.</p>
+    <p><a class="link" href="{% url 'tareas:index' %}">Ver las tareas</a></p>
+  </div>
+</div>
+{% endblock %}
