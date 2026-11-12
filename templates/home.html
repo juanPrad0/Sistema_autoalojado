@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Panel personal: tareas, horarios, portafolio y nube en casa{% endblock %}
+{% block description %}Tareas, horarios, portafolio y archivos en un panel autoalojado: cuatro módulos sobre SQLite, accesibles desde la PC y el teléfono por Tailscale.{% endblock %}
+{% block og_description %}Cuatro módulos en un servidor propio, con SQLite como única base de datos.{% endblock %}
+
+{% block content %}
+<section class="hero hero--split hero--app" data-enter aria-labelledby="hero-h">
+  <div class="wrap">
+    <div class="hero-text grid hero__grid">
+      <div class="hero__text span-6">
+        <p class="hero__kicker"><span class="dot" aria-hidden="true"></span>{{ hoy|date:"l j"|capfirst }} de {{ hoy|date:"F" }}</p>
+        <h1 id="hero-h">Panel personal autoalojado</h1>
+        <p class="hero__lead">Tareas, horarios, portafolio y archivos en un panel que corre en tu equipo, con SQLite adentro.</p>
+        <div class="btn-row">
+          <a class="btn btn--primary" href="{% url 'tareas:index' %}">Abrir tareas<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+          <a class="btn btn--secondary" href="#modulos">Ver los módulos</a>
+        </div>
+        <dl class="hero-facts">
+          <div><dt>Módulos</dt><dd>4 rutas</dd></div>
+          <div><dt>Base de datos</dt><dd>1 archivo SQLite</dd></div>
+          <div><dt>Acceso</dt><dd>PC y teléfono</dd></div>
+        </dl>
+      </div>
+
+      <div class="hero__media span-6 start-7">
+        <div class="appwin ui" role="img" aria-label="El panel de hoy: {{ tareas_pendientes }} tareas pendientes, la semana todavía sin bloques, el portafolio sin posiciones y {{ archivos_nube }} archivos en la nube">
+          <div class="appwin__bar">
+            <span class="appwin__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="appwin__addr">panel.local</span>
+            <span class="appwin__state">SQLite</span>
+          </div>
+          <div class="appwin__body">
+            <div class="appwin__list">
+              <p class="appwin__label">Módulos</p>
+              <div class="appwin__row appwin__row--on">
+                <svg aria-hidden="true"><use href="#icono-tareas"></use></svg>
+                <span>Tareas</span>
+                <span class="appwin__badge">{{ tareas_pendientes }}</span>
+              </div>
+              <div class="appwin__row">
+                <svg aria-hidden="true"><use href="#icono-horarios"></use></svg>
+                <span>Horarios</span>
+                <span class="appwin__badge">—</span>
+              </div>
+              <div class="appwin__row">
+                <svg aria-hidden="true"><use href="#icono-portafolio"></use></svg>
+                <span>Portafolio</span>
+                <span class="appwin__badge">—</span>
+              </div>
+              <div class="appwin__row">
+                <svg aria-hidden="true"><use href="#icono-nube"></use></svg>
+                <span>Nube</span>
+                <span class="appwin__badge">{{ archivos_nube }}</span>
+              </div>
+            </div>
+            <div class="appwin__pane">
+              <div class="appwin__head">
+                <h3>Tareas de hoy</h3>
+                <span class="mono">{{ tareas_pendientes }} pendientes</span>
+              </div>
+              {% for tarea in tareas_recientes|slice:":3" %}
+                <div class="task-line">
+                  <span class="task-line__box" aria-hidden="true"></span>
+                  <span class="task-line__main">
+                    <span class="task-line__title">{{ tarea.titulo }}</span>
+                    <span class="task-line__meta">{% if tarea.fecha_limite %}{{ tarea.fecha_limite|date:"j M" }}{% else %}Sin fecha{% endif %}</span>
+                  </span>
+                  <span class="task-line__prio{% if tarea.prioridad == 'A' %} task-line__prio--alta{% endif %}">{{ tarea.get_prioridad_display }}</span>
+                </div>
+              {% empty %}
+                <div class="task-line">
+                  <span class="task-line__main">
+                    <span class="task-line__title">Sin tareas cargadas</span>
+                    <span class="task-line__meta">La primera se escribe en Tareas.</span>
+                  </span>
+                </div>
+              {% endfor %}
+              <div class="appwin__foot">Se guarda en db.sqlite3 al enviar.</div>
+            </div>
+          </div>
+        </div>
+        <div class="ly-float">
+          <div class="ly-float__row"><span class="ly-live">Hoy</span><span>{{ hoy|date:"j M" }}</span></div>
+          <div class="ly-float__title">{{ tareas_pendientes }} tareas pendientes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section g2m" id="modulos" aria-labelledby="modulos-h">
+  <div class="wrap">
+    <div class="group">
+      <div class="section-head">
+        <h2 id="modulos-h">Cuatro módulos.</h2>
+        <p class="t-lead muted section-head__lead">Cada módulo guarda su parte en el mismo archivo SQLite.</p>
+      </div>
+      <div class="grid">
+        <article class="card card--row card--open span-6">
+          <a class="module-card" href="{% url 'tareas:index' %}">
+            <span class="module-card__head">
+              <svg class="module-card__icon" aria-hidden="true"><use href="#icono-tareas"></use></svg>
+              <h3>Tareas</h3>
+              <span class="module-card__phase">{{ tareas_pendientes }} pendientes</span>
+            </span>
+            <p>Agregar, completar y borrar sin recargar la pantalla.</p>
+            <span class="mini-frame" role="img" aria-label="Fragmento de la interfaz de Tareas: tres tareas con su prioridad">
+              <span class="mini">
+                {% for tarea in tareas_recientes|slice:":3" %}
+                  <span class="mini__row"><span class="mini__box" aria-hidden="true"></span><strong>{{ tarea.titulo }}</strong><span class="mono">{{ tarea.get_prioridad_display }}</span></span>
+                {% empty %}
+                  <span class="mini__empty"><span class="mini__box" aria-hidden="true"></span>Sin tareas cargadas</span>
+                {% endfor %}
+              </span>
+            </span>
+          </a>
+        </article>
+
+        <article class="card card--row card--open span-6">
+          <a class="module-card" href="{% url 'horarios:index' %}">
+            <span class="module-card__head">
+              <svg class="module-card__icon" aria-hidden="true"><use href="#icono-horarios"></use></svg>
+              <h3>Horarios</h3>
+              <span class="module-card__phase">Fase 2</span>
+            </span>
+            <p>La semana en bloques, cada uno con sus tareas.</p>
+            <span class="mini-frame" role="img" aria-label="Fragmento de la interfaz de Tareas: tres tareas con su prioridad">
+              <span class="mini">
+                <span class="mini__week">
+                  <span class="mini__day{% if hoy.weekday == 0 %} mini__day--on{% endif %}">L<i></i></span>
+                  <span class="mini__day{% if hoy.weekday == 1 %} mini__day--on{% endif %}">M<i></i></span>
+                  <span class="mini__day{% if hoy.weekday == 2 %} mini__day--on{% endif %}">M<i></i></span>
+                  <span class="mini__day{% if hoy.weekday == 3 %} mini__day--on{% endif %}">J<i></i></span>
+                  <span class="mini__day{% if hoy.weekday == 4 %} mini__day--on{% endif %}">V<i></i></span>
+                  <span class="mini__day{% if hoy.weekday == 5 %} mini__day--on{% endif %}">S<i></i></span>
+                  <span class="mini__day{% if hoy.weekday == 6 %} mini__day--on{% endif %}">D<i></i></span>
+                </span>
+                <span class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Sin bloques cargados</span>
+              </span>
+            </span>
+          </a>
+        </article>
+      </div>
+    </div>
+
+    <div class="grid">
+      <article class="card card--row card--open span-6">
+        <a class="module-card" href="{% url 'portafolio:index' %}">
+          <span class="module-card__head">
+            <svg class="module-card__icon" aria-hidden="true"><use href="#icono-portafolio"></use></svg>
+            <h3>Portafolio</h3>
+            <span class="module-card__phase">Fase 3</span>
+          </span>
+          <p>Posiciones valuadas con la última cotización.</p>
+          <span class="mini-frame" role="img" aria-label="Fragmento de la interfaz de Tareas: tres tareas con su prioridad">
+            <span class="mini">
+              <span class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Sin posiciones cargadas<span class="mono">0</span></span>
+              <span class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Costo de inversión<span class="mono">—</span></span>
+              <span class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Valor actual<span class="mono">—</span></span>
+            </span>
+          </span>
+        </a>
+      </article>
+
+      <article class="card card--row card--open span-6">
+        <a class="module-card" href="{% url 'nube:index' %}">
+          <span class="module-card__head">
+            <svg class="module-card__icon" aria-hidden="true"><use href="#icono-nube"></use></svg>
+            <h3>Nube</h3>
+            <span class="module-card__phase">Fase 4</span>
+          </span>
+          <p>Archivos del disco, con cada ruta validada.</p>
+          <span class="mini-frame" role="img" aria-label="Fragmento de la interfaz de Tareas: tres tareas con su prioridad">
+            <span class="mini">
+              <span class="mini__row"><svg width="16" height="16" aria-hidden="true" style="color:var(--accent)"><use href="#icono-nube"></use></svg><strong>almacenamiento_nube/</strong><span class="mono">{{ archivos_nube }} archivos</span></span>
+              <span class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Rutas verificadas dentro de la carpeta</span>
+            </span>
+          </span>
+        </a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section statement" id="en-casa" data-moment="word-highlight" aria-label="Todo queda en casa">
+  <div class="wrap">
+    <div class="grid statement__grid">
+      <div class="span-7 stack-4">
+        <p class="t-label">Autoalojado</p>
+        <p class="mo-wh__text">Cuatro módulos, un archivo y tu propia máquina: el portafolio, la semana, los archivos y lo que falta hacer hoy viven en <strong>tu casa</strong>, no en la cuenta de otro.</p>
+      </div>
+      <dl class="statement__facts span-4 start-8">
+        <div><dt>Servidor</dt><dd>Tu equipo</dd></div>
+        <div><dt>Base de datos</dt><dd>SQLite</dd></div>
+        <div><dt>Acceso</dt><dd>Tailscale</dd></div>
+        <div><dt>Interfaz</dt><dd>HTMX + Tailwind</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">Abrir tareas</h2>
+        <p class="t-lead">Lo que falta hacer hoy, con prioridad y fecha límite, en una sola lista.</p>
+      </div>
+      <a class="btn btn--primary btn--xl btn--wide" href="{% url 'tareas:index' %}">Abrir tareas<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-6 stack-4">
+          <a class="nav__logo" href="{% url 'resumen' %}"><span class="mark" data-mark="arc" aria-hidden="true"></span>Panel personal</a>
+          <p class="footer__lede">Cuatro módulos en un servidor propio.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Panel</h3><ul><li><a href="{% url 'resumen' %}">Resumen</a></li><li><a href="{% url 'tareas:index' %}">Tareas</a></li><li><a href="{% url 'horarios:index' %}">Horarios</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Módulos</h3><ul><li><a href="{% url 'portafolio:index' %}">Portafolio</a></li><li><a href="{% url 'nube:index' %}">Nube</a></li><li><a href="#modulos">Ver los módulos</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Ahora</h3><ul><li>Fase 1</li><li>SQLite</li><li>Tailscale</li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Panel personal</span>
+        <span class="mono">127.0.0.1:8000</span>
+      </div>
+    </div>
+  </div>
+</footer>
+{% endblock %}

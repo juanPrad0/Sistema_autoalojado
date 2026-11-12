@@ -1,0 +1,34 @@
+<li id="tarea-{{ tarea.pk }}" class="task-item{% if tarea.completada %} task-item--done{% endif %}">
+  <button class="task-item__toggle" type="button"
+          aria-pressed="{{ tarea.completada|yesno:'true,false' }}"
+          aria-label="{% if tarea.completada %}Marcar «{{ tarea.titulo }}» como pendiente{% else %}Marcar «{{ tarea.titulo }}» como completada{% endif %}"
+          hx-post="{% url 'tareas:alternar' tarea.pk %}"
+          hx-target="closest li"
+          hx-swap="outerHTML">
+    <svg aria-hidden="true"><use href="#icono-check"></use></svg>
+  </button>
+  <div class="task-item__body">
+    <span class="task-item__title">{{ tarea.titulo }}</span>
+    <div class="task-item__meta">
+      <span class="task-item__prio task-item__prio--{{ tarea.prioridad|lower }}">{{ tarea.get_prioridad_display }}</span>
+      {% if tarea.fecha_limite %}
+        <span class="mono{% if tarea.vencida %} task-item__vencida{% endif %}">
+          {% if tarea.vencida %}Venció el {% endif %}{{ tarea.fecha_limite|date:"j M Y" }}
+        </span>
+      {% endif %}
+      {% if tarea.completada %}<span>Completada</span>{% endif %}
+    </div>
+  </div>
+  <button class="task-item__delete" type="button" aria-label="Eliminar «{{ tarea.titulo }}»"
+          hx-delete="{% url 'tareas:eliminar' tarea.pk %}"
+          hx-target="closest li"
+          hx-swap="delete"
+          hx-confirm="¿Eliminar «{{ tarea.titulo }}»?">
+    <svg aria-hidden="true"><use href="#icono-borrar"></use></svg>
+  </button>
+</li>
+{% if oob %}
+  {% include "tareas/partials/_contadores.html" with oob=True %}
+  {% include "tareas/partials/_vacio.html" with oob=True %}
+  {% if limpiar_form %}{% include "tareas/partials/_form_tarea.html" with oob=True %}{% endif %}
+{% endif %}

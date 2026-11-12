@@ -1,0 +1,100 @@
+{% load static %}<!doctype html>
+<html lang="es" data-type="software" data-radius="soft" data-buttons="solid" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Panel personal: el día en una sola pantalla{% endblock %}</title>
+<meta name="description" content="{% block description %}Tareas, horarios, portafolio y archivos en un panel autoalojado que corre en tu propia máquina, con SQLite como única base de datos.{% endblock %}">
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{% block og_title %}Panel personal: el día en una sola pantalla{% endblock %}">
+<meta property="og:description" content="{% block og_description %}Cuatro módulos en un servidor propio: tareas, horarios, portafolio y nube.{% endblock %}">
+<meta property="og:image" content="{% static 'share.jpg' %}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f7f9fa">
+<link rel="icon" href="{% static 'icons/icon.svg' %}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+<link rel="manifest" href="{% static 'manifest.json' %}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Panel">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preload" href="{% static 'fonts/mona-sans-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{% static 'vendor/taste/system.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'vendor/taste/ui/cards.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'vendor/taste/motion/motion.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'vendor/taste/layout/layout.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'css/app.css' %}?v=2">
+<script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+<link rel="modulepreload" href="{% static 'vendor/taste/moments/moments.js' %}">
+<link rel="modulepreload" href="{% static 'vendor/taste/moments/lib.js' %}">
+{% block head %}{% endblock %}
+<script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+</head>
+<body class="bg-ground text-ink antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="icono-resumen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></symbol>
+    <symbol id="icono-portafolio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 16.5 9 10.5l3.5 3 4-5.5 4 4.5"/><path d="M3.5 20.5h17"/></symbol>
+    <symbol id="icono-tareas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m8 12.2 2.6 2.6 5.4-5.6"/></symbol>
+    <symbol id="icono-horarios" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3M8 14h3M8 17.5h6"/></symbol>
+    <symbol id="icono-nube" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h3.6l2 2.5h6.4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="icono-mas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="icono-borrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2a1.6 1.6 0 0 0 1.6 1.5h6a1.6 1.6 0 0 0 1.6-1.5L17.5 7"/><path d="M10.5 11v5.5M13.5 11v5.5"/></symbol>
+    <symbol id="icono-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="m8.4 12.2 2.5 2.5 4.7-5"/></symbol>
+  </defs>
+</svg>
+
+<a class="skip-link" href="#top">Ir al contenido</a>
+
+<header class="nav masthead">
+  <a class="nav__logo" href="{% url 'resumen' %}"><span class="mark" data-mark="arc" aria-hidden="true"></span>Panel personal</a>
+  <p class="masthead__date mono">{{ hoy|date:"D j M" }}</p>
+<nav class="tabbar fixed bottom-0 md:hidden" aria-label="Secciones">
+  {% for modulo in modulos %}
+    <a class="tabbar__link" href="{% url modulo.url_name %}" {% if modulo.clave == modulo_actual %}aria-current="page"{% endif %}>
+      <svg class="tabbar__icon" aria-hidden="true"><use href="#{{ modulo.icono }}"></use></svg>
+      <span>{{ modulo.nombre }}</span>
+    </a>
+  {% endfor %}
+</nav>
+</header>
+
+<aside class="rail">
+  <a class="rail__brand" href="{% url 'resumen' %}"><span class="mark" data-mark="arc" aria-hidden="true"></span><span class="rail__label">Panel personal</span></a>
+  <nav class="rail__nav" aria-label="Secciones">
+    {% for modulo in modulos %}
+      <a class="rail__link" href="{% url modulo.url_name %}" {% if modulo.clave == modulo_actual %}aria-current="page"{% endif %}>
+        <svg class="rail__icon" aria-hidden="true"><use href="#{{ modulo.icono }}"></use></svg>
+        <span class="rail__label">{{ modulo.nombre }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+  <a class="rail__cta" href="{% url 'tareas:index' %}">Abrir tareas</a>
+  <p class="rail__foot">
+    <span class="rail__label">Autoalojado en tu equipo<br><span class="mono">SQLite · Tailscale</span></span>
+    <span class="rail__label mono">v1 · Fase 1</span>
+  </p>
+</aside>
+
+<main id="top" class="{% block main_class %}{% endblock %}">
+{% block content %}{% endblock %}
+</main>
+
+{% block footer %}{% endblock %}
+
+
+<script type="module" src="{% static 'vendor/taste/system.js' %}"></script>
+<script type="module" src="{% static 'vendor/taste/motion/motion.js' %}"></script>
+<script type="module" src="{% static 'vendor/taste/layout/layout.js' %}"></script>
+{% block scripts %}{% endblock %}
+<script>
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
+</script>
+</body>
+</html>

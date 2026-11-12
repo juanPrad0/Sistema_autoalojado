@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Tareas · Panel personal{% endblock %}
+{% block description %}Lista de tareas del panel personal, con prioridad, fecha límite y cambios por HTMX.{% endblock %}
+{% block main_class %}main--app{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <div class="stack-2">
+      <h1>Tareas</h1>
+      <p class="t-lead muted">Lo que falta hacer, con prioridad y fecha. Cada cambio se guarda al instante.</p>
+    </div>
+    {% include "tareas/partials/_contadores.html" %}
+  </div>
+
+  <div class="mt-8">
+    {% include "tareas/partials/_form_tarea.html" %}
+  </div>
+
+  <ul id="lista-tareas" class="task-list mt-6" aria-label="Tareas">
+    {% for tarea in tareas %}
+      {% include "tareas/partials/_item_tarea.html" %}
+    {% endfor %}
+    {% include "tareas/partials/_vacio.html" %}
+  </ul>
+</div>
+{% endblock %}

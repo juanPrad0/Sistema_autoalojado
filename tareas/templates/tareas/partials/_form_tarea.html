@@ -1,0 +1,28 @@
+{% comment %}The form is replaced whole by the create response (OOB) and by the error retarget.{% endcomment %}
+<div id="form-tarea"{% if oob %} hx-swap-oob="outerHTML"{% endif %}>
+  <form class="task-form" method="post" action="{% url 'tareas:crear' %}"
+        hx-post="{% url 'tareas:crear' %}"
+        hx-target="#lista-tareas"
+        hx-swap="afterbegin"
+        hx-on::after-request="if(event.detail.successful){var n=document.getElementById('form-tarea');if(n){var i=n.querySelector('input[name=titulo]');if(i){i.focus()}}}">
+    {% csrf_token %}
+    <div class="task-form__row">
+      <div class="field">
+        <label for="{{ form.titulo.id_for_label }}">Título</label>
+        {{ form.titulo }}
+        {% if form.titulo.errors %}<p class="field__error" id="error-titulo">{{ form.titulo.errors.0 }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="{{ form.prioridad.id_for_label }}">Prioridad</label>
+        {{ form.prioridad }}
+        {% if form.prioridad.errors %}<p class="field__error" id="error-prioridad">{{ form.prioridad.errors.0 }}</p>{% endif %}
+      </div>
+      <div class="field">
+        <label for="{{ form.fecha_limite.id_for_label }}">Fecha límite</label>
+        {{ form.fecha_limite }}
+        {% if form.fecha_limite.errors %}<p class="field__error" id="error-fecha_limite">{{ form.fecha_limite.errors.0 }}</p>{% endif %}
+      </div>
+      <button class="btn btn--primary" type="submit">Añadir tarea</button>
+    </div>
+  </form>
+</div>
