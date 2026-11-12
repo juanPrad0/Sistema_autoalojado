@@ -77,11 +77,14 @@ export CHROME_PATH="$PWD/../.taste-skill/browser/chrome/linux-157.0.8103.50/chro
 node ../.agents/skills/design-taste-frontend/scripts/gate.mjs          # con el servidor en :8765
 ```
 
-Resultado de la Fase 1: `GATE: OPEN 1`. El único hallazgo abierto es `nav` ("no hay barra de
-navegación superior"), consecuencia directa de la barra lateral fija que pide el proyecto: el
-verificador espera una barra superior de sitio de marketing. Los cinco hallazgos de
+Resultado de la Fase 1: `GATE: FAIL 1 (round 2 of 3)`. El único hallazgo abierto es `nav` ("no hay
+barra de navegación superior"), consecuencia directa de la barra lateral fija que pide el proyecto:
+el verificador espera una barra superior de sitio de marketing. Los cinco hallazgos de
 `container-edges` están exceptuados en `.taste-skill/waivers.json` con su motivo (la barra lateral
 es chrome de la aplicación, fuera de la columna de contenido; cada sección usa un único `.wrap`).
+
+El chequeo de layout (`assets/layout/check.mjs`) no encuentra hallazgos en 1440x900, 1024x768,
+820x1180, 768x1024 ni 390x844.
 
 ## Estructura
 
