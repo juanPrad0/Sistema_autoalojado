@@ -95,3 +95,78 @@
   if (query.addEventListener) query.addEventListener("change", onChange);
   else query.addListener(onChange);
 })();
+
+/* Background refresh: every 5 seconds the list alone is re-fetched. The response carries an ETag
+   built from the rows; if nothing changed the server answers 304 and the DOM is left untouched, so
+   there is no flicker. The form is never part of the swap, so a draft in the input survives. */
+(function () {
+  var lista = document.getElementById("lista-tareas");
+  if (!lista) return;
+  var url = lista.getAttribute("data-refresh-url");
+  if (!url) return;
+
+  var intervalo = 5000;
+  var enCurso = false;
+  var timer = null;
+
+  function versionActual() {
+    var marcador = document.getElementById("lista-version");
+    return (marcador && marcador.getAttribute("data-version")) || lista.getAttribute("data-version") || "";
+  }
+
+  function guardarVersion(version) {
+    if (!version) return;
+    lista.setAttribute("data-version", version);
+    var marcador = document.getElementById("lista-version");
+    if (marcador) marcador.setAttribute("data-version", version);
+  }
+
+  async function refrescar() {
+    if (enCurso || document.hidden) return;
+    // a local create/toggle/delete in flight wins: its fragment already updates the list
+    if (document.querySelector(".htmx-request")) return;
+    enCurso = true;
+    try {
+      var version = versionActual();
+      var respuesta = await fetch(url, {
+        headers: version ? { "If-None-Match": '"' + version + '"' } : {},
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+      if (respuesta.status === 304 || !respuesta.ok) return;
+      var etag = (respuesta.headers.get("ETag") || "").replace(/"/g, "");
+      if (etag && etag === version) return; // same rows: do not touch the DOM
+      var html = await respuesta.text();
+      lista.innerHTML = html;
+      // the injected rows carry hx-* attributes; htmx must bind them or their buttons do nothing
+      if (window.htmx) window.htmx.process(lista);
+      guardarVersion(etag || version);
+    } catch (error) {
+      /* offline or the server is resting: keep the list on screen, retry on the next tick */
+    } finally {
+      enCurso = false;
+    }
+  }
+
+  function parar() {
+    if (timer) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  function arrancar() {
+    parar();
+    timer = window.setInterval(refrescar, intervalo);
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) parar();
+    else {
+      refrescar();
+      arrancar();
+    }
+  });
+
+  arrancar();
+})();

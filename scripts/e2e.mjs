@@ -111,6 +111,53 @@ try {
   await created.waitFor({ state: "detached", timeout: 5000 });
 
   check(errors.length === 0, `consola sin errores${errors.length ? ": " + errors.slice(0, 3).join(" | ") : ""}`);
+
+  // background refresh: another device adds a task; this page picks it up without touching the form
+  const deviceA = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  deviceA.on("dialog", (d) => d.accept());
+  await deviceA.goto(`${base}/tareas/`, { waitUntil: "networkidle" });
+  await deviceA.evaluate(() => (window.__sinRecarga = true));
+  await deviceA.fill('input[name="titulo"]', "borrador sin guardar");
+  const mutaciones = await deviceA.evaluate(
+    () =>
+      new Promise((resolve) => {
+        let n = 0;
+        const obs = new MutationObserver((lista) => {
+          n += lista.length;
+        });
+        obs.observe(document.getElementById("lista-tareas"), {
+          childList: true,
+          subtree: true,
+          characterData: true,
+          attributes: true,
+        });
+        setTimeout(() => {
+          obs.disconnect();
+          resolve(n);
+        }, 6000);
+      }),
+  );
+  check(mutaciones === 0, "refresco: sin cambios no toca el DOM (sin parpadeo)");
+  check(await deviceA.evaluate(() => window.__sinRecarga === true), "refresco: la página no se recargó");
+
+  const deviceB = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  deviceB.on("dialog", (d) => d.accept());
+  await deviceB.goto(`${base}/tareas/`, { waitUntil: "networkidle" });
+  const remota = `Remota ${Date.now()}`;
+  await deviceB.fill('input[name="titulo"]', remota);
+  await deviceB.click('button[type="submit"]');
+  await deviceB.locator("li.task-item", { hasText: remota }).first().waitFor({ state: "visible", timeout: 5000 });
+
+  const remotaEnA = deviceA.locator("li.task-item", { hasText: remota }).first();
+  await remotaEnA.waitFor({ state: "visible", timeout: 9000 });
+  check(true, "refresco: la tarea cargada en otro dispositivo aparece sola");
+  check((await deviceA.inputValue('input[name="titulo"]')) === "borrador sin guardar", "refresco: no borra lo que se está escribiendo");
+  check(await deviceA.evaluate(() => window.__sinRecarga === true), "refresco: sigue sin recargar la página");
+
+  await remotaEnA.locator("button.task-item__delete").click();
+  await remotaEnA.waitFor({ state: "detached", timeout: 5000 });
+  await deviceA.close();
+  await deviceB.close();
 } finally {
   await browser.close();
 }

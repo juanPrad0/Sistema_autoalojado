@@ -16,6 +16,7 @@ Design system: design-taste-frontend 2.5.1 (software kind), dealt palette `cool-
 - **S9** `tareas/templates/tareas/index.html`, `partials/_form_tarea.html` and `partials/_item_tarea.html`: every mutation returns only the fragment, swapped by `hx-post`/`hx-delete` with `hx-target`/`hx-swap`, no full page reload.
 - **S10** `python manage.py check` and `runserver` start without errors; `python manage.py test` passes.
 - **S11** Visual gate: `node .agents/skills/design-taste-frontend/scripts/gate.mjs` runs against the live dev server with `CHROME_PATH` exported and its findings are fixed or reported.
+- **S13** Tareas refresh: the list re-fetches `GET /tareas/lista/` every 5 s, sending the last `ETag`; `304` leaves the DOM untouched, a change replaces only the list container. The form is never part of the swap, so a draft in the input survives; polling pauses when the tab is hidden and while a local HTMX request is in flight.
 - **S12** Tareas, phone (<768px): the inline create form is hidden so the list starts right under the counters; a circular "+" above the bottom bar opens a bottom sheet with Título, Prioridad, Fecha límite and Añadir tarea, which closes on create or on a tap outside. From 768px the form stays horizontal and inline, unchanged.
 
 ## Tasks
@@ -31,6 +32,7 @@ Design system: design-taste-frontend 2.5.1 (software kind), dealt palette `cool-
 | T7 | S10 | inline | done | `manage.py check` clean; 18 tests OK; scripts/e2e.mjs 15/15 in Chrome |
 | T8 | S11 | inline | done | GATE: FAIL 1 (round 2 of 3) — only `nav`, see L6 |
 | T9 | S12 | inline | done | bottom sheet + FAB; 19 tests OK; e2e (desktop and phone) OK |
+| T10 | S13 | inline | done | GET /tareas/lista/ + ETag/304, polling in tareas.js; 25 tests OK; e2e: 0 mutations idle, remote task arrives with the draft intact |
 
 ## Log
 
@@ -42,4 +44,5 @@ Design system: design-taste-frontend 2.5.1 (software kind), dealt palette `cool-
 - **L6** Gate run on the final page: `GATE: FAIL 1 (round 2 of 3)`, 1 FAIL (`nav`), 5 waivers, 3 WARN (`scroll-reveal` and `split-pair` inside the dealt moment, `fade-cut` on a mock row). Rounds were not forced to OPEN because no legal fix exists for `nav` without dropping the required sidebar.
 - **L7** Phone compose (2026-11-13): on a phone the form became a bottom sheet behind a round "+" button above the tab bar, so the list sits right under the counters. One form element serves both layouts (inline from 768px, sheet below), the create response carries `HX-Trigger: tarea-creada` to close the sheet, and the service worker cache version moved to `panel-v2` so the phone picks up the new CSS.
 - **L8** Stale PWA cache (2026-11-13): after the phone-sheet deploy the browser kept the old `app.css` (service worker, cache-first), so the new markup rendered unstyled. Fixed for good: the worker registers only with `DEBUG=False` (or `PWA_ENABLED=True`), the page unregisters any old worker, clears its caches and reloads once, and every CSS/JS URL carries a `?v=` mtime stamp.
+- **L10** Background refresh (2026-11-14): the list polls `GET /tareas/lista/` every 5 s with `If-None-Match`; the server answers 304 on an unchanged fingerprint, so an idle list produces zero DOM mutations (measured in e2e). A change replaces `#lista-tareas` and `htmx.process()` binds the injected rows; the form is outside the swap. Polling stops when the tab is hidden and skips a tick while an HTMX request is in flight.
 - **L9** Verification: `python manage.py check` clean; `python manage.py test` 18 tests OK; `node scripts/e2e.mjs` passes create/toggle/delete in a real Chrome with no page reload; screenshots at 1440 and 390 reviewed.

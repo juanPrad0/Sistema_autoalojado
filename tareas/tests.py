@@ -100,3 +100,46 @@ class ResumenTests(TestCase):
         self.assertEqual(response.context["tareas_pendientes"], 1)
         self.assertEqual(response.context["tareas_completadas"], 1)
         self.assertContains(response, "Panel personal")
+
+
+class ListaRefrescoTests(TestCase):
+    """The 5-second background refresh: a fragment, an ETag and a 304 when nothing changed."""
+
+    def setUp(self):
+        self.tarea = Tarea.objects.create(titulo="Lista", prioridad="M")
+
+    def test_lista_devuelve_solo_el_fragmento(self):
+        response = self.client.get(reverse("tareas:lista"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.tarea.titulo)
+        self.assertNotContains(response, "<html")
+        self.assertNotContains(response, "<ul")
+        self.assertIn("ETag", response)
+        self.assertEqual(response["Cache-Control"], "no-cache")
+
+    def test_304_si_nada_cambio(self):
+        etag = self.client.get(reverse("tareas:lista"))["ETag"]
+        otra = self.client.get(reverse("tareas:lista"), HTTP_IF_NONE_MATCH=etag)
+        self.assertEqual(otra.status_code, 304)
+        self.assertEqual(otra.content, b"")
+
+    def test_etag_cambia_cuando_cambia_la_lista(self):
+        antes = self.client.get(reverse("tareas:lista"))["ETag"]
+        self.tarea.completada = True
+        self.tarea.save()
+        despues = self.client.get(reverse("tareas:lista"))["ETag"]
+        self.assertNotEqual(antes, despues)
+
+    def test_index_trae_la_url_y_la_version(self):
+        response = self.client.get(reverse("tareas:index"))
+        self.assertContains(response, 'data-refresh-url="/tareas/lista/"')
+        self.assertContains(response, 'id="lista-version"')
+
+    def test_crear_deja_la_version_nueva_en_el_oob(self):
+        response = self.client.post(
+            reverse("tareas:crear"),
+            {"titulo": "Nueva", "prioridad": "B"},
+            HTTP_HX_REQUEST="true",
+        )
+        etag = self.client.get(reverse("tareas:lista"))["ETag"].strip('"')
+        self.assertContains(response, f'data-version="{etag}"')

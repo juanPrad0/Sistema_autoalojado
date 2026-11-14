@@ -30,5 +30,6 @@
 {% if oob %}
   {% include "tareas/partials/_contadores.html" with oob=True %}
   {% include "tareas/partials/_vacio.html" with oob=True %}
+  {% include "tareas/partials/_version_lista.html" with oob=True %}
   {% if limpiar_form %}{% include "tareas/partials/_form_tarea.html" with oob=True %}{% endif %}
 {% endif %}

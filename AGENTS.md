@@ -144,6 +144,7 @@ dashboard_personal/
 ### Módulo 2: `tareas` (CRUD Dinámico con HTMX)
 - **Modelo `Tarea` (`RF-04`):** Campos `titulo`, `completada` (bool), `prioridad` (`B` Baja, `M` Media, `A` Alta), `fecha_limite` (opcional), `creada_en`.
 - **Interactividad (`RNF-05`):** Añadir tarea, alternar estado completada/pendiente y eliminar tarea deben responder únicamente el fragmento HTML (`_item_tarea.html`) usando atributos `hx-post`, `hx-patch`/`hx-post` y `hx-delete` con `hx-target` y `hx-swap`, sin recargar toda la pantalla.
+- **Refresco en segundo plano (`RNF-05`):** La lista se actualiza sola cada 5 segundos con `GET /tareas/lista/`, que devuelve únicamente el fragmento de la lista y un `ETag` calculado sobre las filas. Si nada cambió responde `304 Not Modified` y el navegador no toca el DOM (cero parpadeo); si cambió, reemplaza solo el contenedor de la lista. El formulario nunca participa del refresco, así que no se pierde lo que el usuario está escribiendo.
 
 ### Módulo 3: `horarios` (Calendario Semanal Vinculado)
 - **Modelo `BloqueHorario` (`RF-05`, `RF-06`):** Campos `dia_semana` (0=Lunes a 6=Domingo), `hora_inicio`, `hora_fin`, `titulo_actividad`, `color_hex` y relación `ManyToManyField(Tarea, blank=True, related_name='bloques_horario')`.
@@ -157,7 +158,7 @@ dashboard_personal/
 
 ## 5. Plan de Fases de Desarrollo
 
-1. **Fase 1 (Núcleo, Diseño Base con Taste-Skill y Módulo de Tareas):** Inicialización del proyecto Django, `.env`, `base.html` adaptable (PC + Móvil PWA) diseñado y validado con `design-taste-frontend`, vista `home.html` y CRUD completo de `tareas` con HTMX.
+1. **Fase 1 (Núcleo, Diseño Base con Taste-Skill y Módulo de Tareas):** Inicialización del proyecto Django, `.env`, `base.html` adaptable (PC + Móvil PWA) diseñado y validado con `design-taste-frontend`, vista `home.html`, CRUD completo de `tareas` con HTMX y refresco automático de la lista cada 5 segundos.
 2. **Fase 2 (Módulo de Horarios y Vinculación):** Modelo, vistas y fragmentos HTMX de `horarios` vinculados en tiempo real con `tareas`.
 3. **Fase 3 (Módulo de Portafolio Financiero con Patrón Observer):** Implementación de `PosicionAccion`, `observers.py`, `services.py` (conector híbrido WebSocket + REST para Finnhub) y vistas reactivas con HTMX.
 4. **Fase 4 (Módulo de Nube Personal):** Implementación del explorador seguro de archivos locales, carga multiparte y descarga directa.

@@ -7,6 +7,7 @@ app_name = "tareas"
 urlpatterns = [
     path("", views.index, name="index"),
     path("crear/", views.crear, name="crear"),
+    path("lista/", views.lista, name="lista"),
     path("<int:pk>/alternar/", views.alternar, name="alternar"),
     path("<int:pk>/eliminar/", views.eliminar, name="eliminar"),
 ]

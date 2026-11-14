@@ -31,12 +31,11 @@
     <svg aria-hidden="true"><use href="#icono-mas"></use></svg>
   </button>
 
-  <ul id="lista-tareas" class="task-list mt-6" aria-label="Tareas">
-    {% for tarea in tareas %}
-      {% include "tareas/partials/_item_tarea.html" %}
-    {% endfor %}
-    {% include "tareas/partials/_vacio.html" %}
+  <ul id="lista-tareas" class="task-list mt-6" aria-label="Tareas"
+      data-refresh-url="{% url 'tareas:lista' %}" data-version="{{ lista_version }}">
+    {% include "tareas/partials/_lista_tareas.html" %}
   </ul>
+  {% include "tareas/partials/_version_lista.html" %}
 </div>
 {% endblock %}
 

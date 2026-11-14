@@ -67,6 +67,9 @@ npx tailwindcss -i static/src/app.css -o static/css/app.css --minify
   al caché si el servidor no responde.
 - **Tareas:** crear, completar/pendiente y eliminar sin recargar la página (HTMX). Cada operación
   responde su propio fragmento; los contadores se actualizan con un intercambio fuera de banda.
+- **Lista viva:** cada 5 segundos se pide `GET /tareas/lista/` con el `ETag` anterior. Si nada cambió
+  el servidor responde `304` y el DOM queda intacto (sin parpadeo); si cambió, se reemplaza solo el
+  contenedor de la lista. El formulario nunca se toca, así que un borrador en el campo no se pierde.
 
 ## Pruebas
 
