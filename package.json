@@ -1,0 +1,25 @@
+{
+  "name": "sistema_autoalojado",
+  "version": "1.0.0",
+  "description": "El sistema es una aplicación web monolítica y modular autoalojada en un único servidor (PC personal) para usar como visualizador financiaro, administrador de horarios y  administrador de tareasccesible desde PC (monitor escritorio) y Teléfono Móvil (PWA instalada) a través de una red privada virtual Tailscale.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juanPrad0/Sistema_autoalojado.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/juanPrad0/Sistema_autoalojado/issues"
+  },
+  "homepage": "https://github.com/juanPrad0/Sistema_autoalojado#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "playwright-core": "^1.65.0",
+    "tailwindcss": "^4.3.5"
+  }
+}

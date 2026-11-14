@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Portafolio · Panel personal{% endblock %}
+{% block description %}Posiciones de acciones con costo, valor actual y rendimiento, valuadas con Finnhub.{% endblock %}
+{% block main_class %}main--app{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <div class="stack-2">
+      <h1>Portafolio</h1>
+      <p class="t-lead muted">Posiciones con cantidad y precio promedio de compra, valuadas con la última cotización.</p>
+    </div>
+    <span class="chip-fase">Fase 3</span>
+  </div>
+
+  <div class="modulo-vacio mt-8">
+    <div class="mini-frame" data-visual>
+      <div class="mini">
+        <div class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Sin posiciones cargadas<span class="mono">0</span></div>
+        <div class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Costo de inversión<span class="mono">—</span></div>
+        <div class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Valor actual de mercado<span class="mono">—</span></div>
+        <div class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Rendimiento porcentual<span class="mono">—</span></div>
+      </div>
+    </div>
+    <p class="t-small muted">La Fase 3 agrega el modelo de posiciones, el patrón observer para cachear cotizaciones y el conector de Finnhub con el límite de 60 llamadas por minuto. Las posiciones que cargues van a quedar en la misma base SQLite que las tareas.</p>
+    <p><a class="link" href="{% url 'resumen' %}">Volver al resumen</a></p>
+  </div>
+</div>
+{% endblock %}

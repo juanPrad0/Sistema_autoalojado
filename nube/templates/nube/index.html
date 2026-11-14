@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Nube · Panel personal{% endblock %}
+{% block description %}Explorador de la carpeta de archivos autoalojada, con cada ruta validada dentro de la raíz.{% endblock %}
+{% block main_class %}main--app{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="page-head">
+    <div class="stack-2">
+      <h1>Nube</h1>
+      <p class="t-lead muted">Una carpeta del disco para subir y bajar archivos desde la PC o el teléfono, sin salir de casa.</p>
+    </div>
+    <span class="chip-fase">Fase 4</span>
+  </div>
+
+  <div class="modulo-vacio mt-8">
+    <div class="mini-frame" data-visual>
+      <div class="mini">
+        <div class="mini__row">
+          <svg width="16" height="16" aria-hidden="true" style="color:var(--accent)"><use href="#icono-nube"></use></svg>
+          <strong>almacenamiento_nube/</strong>
+          <span class="mono">{{ archivos }} archivos</span>
+        </div>
+        <div class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Raíz en {{ raiz }}</div>
+        <div class="mini__row"><span class="mini__dot" aria-hidden="true"></span>Rutas resueltas y verificadas dentro de la raíz</div>
+      </div>
+    </div>
+    <p class="t-small muted">La Fase 4 agrega el listado de carpetas, la creación de subcarpetas, la carga de varios archivos y la descarga directa. Cada ruta recibida se resuelve y se comprueba como hija estricta de la raíz para bloquear cualquier intento de salir de la carpeta.</p>
+    <p><a class="link" href="{% url 'resumen' %}">Volver al resumen</a></p>
+  </div>
+</div>
+{% endblock %}

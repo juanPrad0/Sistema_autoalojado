@@ -1,0 +1,5 @@
+<div id="contadores-tareas" class="counters"{% if oob %} hx-swap-oob="outerHTML"{% endif %}>
+  <span><b>{{ pendientes }}</b> pendientes</span>
+  <span><b>{{ completadas }}</b> completadas</span>
+  {% if vencidas %}<span class="vencidas"><b>{{ vencidas }}</b> vencidas</span>{% endif %}
+</div>
