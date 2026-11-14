@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="{% static 'vendor/taste/ui/cards.css' %}?v=1">
 <link rel="stylesheet" href="{% static 'vendor/taste/motion/motion.css' %}?v=1">
 <link rel="stylesheet" href="{% static 'vendor/taste/layout/layout.css' %}?v=1">
-<link rel="stylesheet" href="{% static 'css/app.css' %}?v=2">
+<link rel="stylesheet" href="{% static 'css/app.css' %}?v={{ asset_version }}">
 <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
 <script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
 <link rel="modulepreload" href="{% static 'vendor/taste/moments/moments.js' %}">
@@ -89,6 +89,7 @@
 <script type="module" src="{% static 'vendor/taste/motion/motion.js' %}"></script>
 <script type="module" src="{% static 'vendor/taste/layout/layout.js' %}"></script>
 {% block scripts %}{% endblock %}
+{% if pwa_habilitada %}
 <script>
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load', function () {
@@ -96,5 +97,28 @@
     });
   }
 </script>
+{% else %}
+<script>
+  /* Development: no service worker, because it serves the old CSS and hides every change.
+     If one is already registered from a previous run, drop it and its caches, then reload once. */
+  (function () {
+    if (!('serviceWorker' in navigator)) return;
+    var registros = navigator.serviceWorker.getRegistrations().then(function (list) {
+      return Promise.all(list.map(function (r) { return r.unregister(); })).then(function () { return list.length; });
+    });
+    var cachesBorrados = window.caches
+      ? caches.keys().then(function (keys) {
+          return Promise.all(keys.map(function (key) { return caches.delete(key); })).then(function () { return keys.length; });
+        })
+      : Promise.resolve(0);
+    Promise.all([registros, cachesBorrados]).then(function (result) {
+      if ((result[0] || result[1]) && !sessionStorage.getItem('sw-limpio')) {
+        sessionStorage.setItem('sw-limpio', '1');
+        location.reload();
+      }
+    });
+  })();
+</script>
+{% endif %}
 </body>
 </html>

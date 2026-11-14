@@ -41,5 +41,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/tareas.js' %}" defer></script>
+<script src="{% static 'js/tareas.js' %}?v={{ asset_version }}" defer></script>
 {% endblock %}

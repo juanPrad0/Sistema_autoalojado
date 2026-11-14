@@ -38,6 +38,15 @@ Abrí <http://localhost:8000/> en la PC. Desde el teléfono, entrá con la IP de
 | `ALLOWED_HOSTS` | `localhost,127.0.0.1,100.*`. El comodín `100.*` cubre las IP del rango Tailscale; Django no acepta comodines de IP, así que los valida `config.middleware.PrefixHostMiddleware` antes de `get_host()`. |
 | `TAILSCALE_CIDR` | Opcional, por defecto `100.64.0.0/10`. |
 
+### PWA y caché en desarrollo
+
+El service worker se registra solo con `DEBUG=False`; `PWA_ENABLED=True` lo fuerza para probar la
+instalación. Mientras desarrollás no hay caché de por medio. Si una versión anterior dejó un service
+worker registrado, la primera carga lo desregistra, borra sus cachés y recarga sola una vez.
+
+El CSS y los scripts se piden con `?v=` (el mtime más nuevo de `static/css/app.css` y
+`static/js/*.js`), así ningún navegador ni service worker conserva una versión vieja.
+
 ### Estilos
 
 El CSS compilado (`static/css/app.css`) está versionado para que el servidor no necesite Node.

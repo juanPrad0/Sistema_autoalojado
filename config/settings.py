@@ -22,6 +22,10 @@ def env_bool(name: str, default: bool = False) -> bool:
 SECRET_KEY = env("SECRET_KEY", "dev-only-insecure-key-set-SECRET_KEY-in-dotenv")
 DEBUG = env_bool("DEBUG", True)
 
+# The service worker caches the shell and serves stale CSS while you edit. It is on in
+# production and off in development; PWA_ENABLED=True forces it on for a PWA test.
+PWA_ENABLED = env_bool("PWA_ENABLED", not DEBUG)
+
 # Django only understands exact hosts and ".domain" suffixes. Entries written as a
 # prefix wildcard ("100.*", for the Tailscale range) are kept aside and validated by
 # config.middleware.PrefixHostMiddleware, which appends the resolved host at request time.

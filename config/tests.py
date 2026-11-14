@@ -23,3 +23,17 @@ class PrefixHostMiddlewareTests(TestCase):
     def test_localhost_aceptado(self):
         response = self.client.get("/", SERVER_NAME="localhost")
         self.assertEqual(response.status_code, 200)
+
+
+class PwaTests(TestCase):
+    def test_desarrollo_no_registra_el_service_worker(self):
+        response = self.client.get("/")
+        self.assertContains(response, "sw-limpio")
+        self.assertNotContains(response, "serviceWorker.register")
+        self.assertContains(response, "css/app.css?v=")
+
+    @override_settings(PWA_ENABLED=True)
+    def test_la_bandera_activa_el_registro(self):
+        response = self.client.get("/")
+        self.assertContains(response, "serviceWorker.register")
+        self.assertNotContains(response, "sw-limpio")

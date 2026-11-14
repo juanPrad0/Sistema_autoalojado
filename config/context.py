@@ -1,7 +1,9 @@
 """Navigation shared by every page: one source for the rail and the phone bar."""
 
 from dataclasses import dataclass
+from pathlib import Path
 
+from django.conf import settings
 from django.utils import timezone
 
 
@@ -33,6 +35,17 @@ def _clave_actual(request) -> str:
     return match.app_name or ""
 
 
+def _version_assets() -> str:
+    """The newest mtime of the CSS build and the app scripts: a changed file gets a new URL, so no
+    browser or service worker can keep serving the old one."""
+    base = Path(settings.BASE_DIR) / "static"
+    archivos = [base / "css" / "app.css", *sorted((base / "js").glob("*.js"))]
+    try:
+        return str(int(max(p.stat().st_mtime for p in archivos if p.exists())))
+    except ValueError:
+        return "1"
+
+
 def modulos(request):
     ahora = timezone.localtime()
     return {
@@ -40,4 +53,6 @@ def modulos(request):
         "modulo_actual": _clave_actual(request),
         "hoy": ahora.date(),
         "ahora": ahora,
+        "pwa_habilitada": getattr(settings, "PWA_ENABLED", False),
+        "asset_version": _version_assets(),
     }
