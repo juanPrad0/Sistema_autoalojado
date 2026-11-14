@@ -74,6 +74,42 @@ try {
   check(barVisible && !railHidden, "móvil: barra inferior visible y rail oculto");
   check((await page.locator("nav.tabbar a").count()) === 5, "móvil: cinco destinos en la barra");
 
+  // the phone creates through the bottom sheet, not the inline form
+  await page.goto(`${base}/tareas/`, { waitUntil: "networkidle" });
+  const fab = page.locator("[data-abrir-hoja]");
+  const sheetForm = page.locator("#form-tarea");
+  check(await fab.isVisible(), "móvil: el botón + está visible");
+  check(!(await sheetForm.isVisible()), "móvil: el formulario fijo está oculto (la lista va arriba)");
+  const fabBox = await fab.boundingBox();
+  const barBox = await page.locator("nav.tabbar").boundingBox();
+  check(fabBox && barBox && fabBox.y + fabBox.height <= barBox.y, "móvil: el + queda por encima de la barra");
+  const listTop = (await page.locator("#lista-tareas").boundingBox()).y;
+  const countersBottom = (await page.locator("#contadores-tareas").boundingBox()).y + (await page.locator("#contadores-tareas").boundingBox()).height;
+  check(listTop - countersBottom < 80, "móvil: la lista arranca debajo de los contadores");
+
+  await fab.click();
+  await sheetForm.waitFor({ state: "visible", timeout: 5000 });
+  check((await page.locator(".task-compose__sheet").getAttribute("role")) === "dialog", "hoja: abre como diálogo");
+  const sheetTitle = `Hoja e2e ${Date.now()}`;
+  await page.fill('input[name="titulo"]', sheetTitle);
+  await page.selectOption('select[name="prioridad"]', "M");
+  await page.click('button[type="submit"]');
+  await page.locator("li.task-item", { hasText: sheetTitle }).first().waitFor({ state: "visible", timeout: 5000 });
+  await sheetForm.waitFor({ state: "hidden", timeout: 5000 });
+  check(true, "hoja: al crear la tarea se cierra sola");
+  check((await fab.getAttribute("aria-expanded")) === "false", "hoja: el botón vuelve a aria-expanded=false");
+
+  await fab.click();
+  await sheetForm.waitFor({ state: "visible", timeout: 5000 });
+  await page.mouse.click(6, 6);
+  await sheetForm.waitFor({ state: "hidden", timeout: 5000 });
+  check(true, "hoja: tocar fuera la cierra");
+
+  // leave the development database as it was found
+  const created = page.locator("li.task-item", { hasText: sheetTitle }).first();
+  await created.locator("button.task-item__delete").click();
+  await created.waitFor({ state: "detached", timeout: 5000 });
+
   check(errors.length === 0, `consola sin errores${errors.length ? ": " + errors.slice(0, 3).join(" | ") : ""}`);
 } finally {
   await browser.close();

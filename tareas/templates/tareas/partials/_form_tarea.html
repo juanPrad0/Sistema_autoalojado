@@ -3,8 +3,7 @@
   <form class="task-form" method="post" action="{% url 'tareas:crear' %}"
         hx-post="{% url 'tareas:crear' %}"
         hx-target="#lista-tareas"
-        hx-swap="afterbegin"
-        hx-on::after-request="if(event.detail.successful){var n=document.getElementById('form-tarea');if(n){var i=n.querySelector('input[name=titulo]');if(i){i.focus()}}}">
+        hx-swap="afterbegin">
     {% csrf_token %}
     <div class="task-form__row">
       <div class="field">

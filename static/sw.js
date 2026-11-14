@@ -1,5 +1,5 @@
 /* Panel personal: the shell is cached, pages stay fresh, stale cache is dropped on activate. */
-const VERSION = "panel-v1";
+const VERSION = "panel-v2";
 const SHELL = [
   "/",
   "/static/css/app.css",

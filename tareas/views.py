@@ -51,11 +51,14 @@ def crear(request):
         return response
 
     tarea = form.save()
-    return render(
+    response = render(
         request,
         "tareas/partials/_item_tarea.html",
         {"tarea": tarea, "form": TareaForm(), "oob": True, "limpiar_form": True, **_contadores()},
     )
+    # the page listens for this to close the phone sheet (or refocus the inline form)
+    response["HX-Trigger"] = "tarea-creada"
+    return response
 
 
 @require_POST

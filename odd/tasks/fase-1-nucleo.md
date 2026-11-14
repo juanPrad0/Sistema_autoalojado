@@ -16,6 +16,7 @@ Design system: design-taste-frontend 2.5.1 (software kind), dealt palette `cool-
 - **S9** `tareas/templates/tareas/index.html`, `partials/_form_tarea.html` and `partials/_item_tarea.html`: every mutation returns only the fragment, swapped by `hx-post`/`hx-delete` with `hx-target`/`hx-swap`, no full page reload.
 - **S10** `python manage.py check` and `runserver` start without errors; `python manage.py test` passes.
 - **S11** Visual gate: `node .agents/skills/design-taste-frontend/scripts/gate.mjs` runs against the live dev server with `CHROME_PATH` exported and its findings are fixed or reported.
+- **S12** Tareas, phone (<768px): the inline create form is hidden so the list starts right under the counters; a circular "+" above the bottom bar opens a bottom sheet with Título, Prioridad, Fecha límite and Añadir tarea, which closes on create or on a tap outside. From 768px the form stays horizontal and inline, unchanged.
 
 ## Tasks
 
@@ -29,6 +30,7 @@ Design system: design-taste-frontend 2.5.1 (software kind), dealt palette `cool-
 | T6 | S8, S9 | inline | done | 92944d0: views, urls, _form_tarea/_item_tarea/_contadores, HTMX |
 | T7 | S10 | inline | done | `manage.py check` clean; 18 tests OK; scripts/e2e.mjs 15/15 in Chrome |
 | T8 | S11 | inline | done | GATE: FAIL 1 (round 2 of 3) — only `nav`, see L6 |
+| T9 | S12 | inline | done | bottom sheet + FAB; 19 tests OK; e2e (desktop and phone) OK |
 
 ## Log
 
@@ -38,4 +40,5 @@ Design system: design-taste-frontend 2.5.1 (software kind), dealt palette `cool-
 - **L4** Tailwind is compiled locally (v4 CLI, theme + utilities, no preflight so the skill's system.css keeps its reset); the skill's own system/layout/motion/cards CSS is vendored unchanged under `static/vendor/taste/`.
 - **L5** The app shell keeps the brief's fixed 248px rail (desktop) and 64px bottom bar (phone). The gate's `nav` rule wants a top marketing bar instead, so it is the one open FAIL; the five `container-edges` findings caused by the rail offset are waived with reasons in `.taste-skill/waivers.json`. Layout check: no findings at 1440x900, 1024x768, 820x1180, 768x1024 and 390x844.
 - **L6** Gate run on the final page: `GATE: FAIL 1 (round 2 of 3)`, 1 FAIL (`nav`), 5 waivers, 3 WARN (`scroll-reveal` and `split-pair` inside the dealt moment, `fade-cut` on a mock row). Rounds were not forced to OPEN because no legal fix exists for `nav` without dropping the required sidebar.
-- **L7** Verification: `python manage.py check` clean; `python manage.py test` 18 tests OK; `node scripts/e2e.mjs` passes create/toggle/delete in a real Chrome with no page reload; screenshots at 1440 and 390 reviewed.
+- **L7** Phone compose (2026-11-13): on a phone the form became a bottom sheet behind a round "+" button above the tab bar, so the list sits right under the counters. One form element serves both layouts (inline from 768px, sheet below), the create response carries `HX-Trigger: tarea-creada` to close the sheet, and the service worker cache version moved to `panel-v2` so the phone picks up the new CSS.
+- **L8** Verification: `python manage.py check` clean; `python manage.py test` 18 tests OK; `node scripts/e2e.mjs` passes create/toggle/delete in a real Chrome with no page reload; screenshots at 1440 and 390 reviewed.

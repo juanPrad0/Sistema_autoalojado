@@ -312,6 +312,92 @@
   @media (min-width: 640px) {
     .task-form__row { grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr) minmax(0, 1.1fr) auto; align-items: end; }
   }
+  /* compose: the horizontal form stays inline on a desktop; under 768px it becomes a bottom sheet
+     opened by the round button, so the list sits right under the counters on a phone */
+  .task-compose { display: block; margin-top: var(--s-8); }
+  .task-compose__head { display: none; }
+  .fab { display: none; }
+
+  @media (max-width: 767px) {
+    .task-compose { display: none; margin-top: 0; }
+    .task-compose.is-abierta {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: grid;
+      align-items: end;
+      background: color-mix(in oklab, var(--p-ink) 45%, transparent);
+    }
+    .task-compose__sheet {
+      max-height: 92svh;
+      overflow-y: auto;
+      padding: var(--s-2) var(--gut) calc(var(--s-6) + env(safe-area-inset-bottom));
+      border-radius: 20px 20px 0 0;
+      background: var(--p-bg);
+      box-shadow: 0 -1px 0 var(--line), 0 -24px 48px color-mix(in oklab, var(--p-ink) 18%, transparent);
+      animation: hoja-subir 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .task-compose__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-4);
+      padding: var(--s-3) 0 var(--s-2);
+    }
+    .task-compose__head h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .task-compose__close {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      margin-right: calc(-1 * var(--s-3));
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .task-compose__close:hover { background: var(--surface); color: var(--ink); }
+    .task-compose .task-form__row { grid-template-columns: minmax(0, 1fr); }
+    .task-compose .task-form__row .btn { width: 100%; }
+    .task-compose .field label { font-size: var(--t-small); }
+
+    .fab {
+      position: fixed;
+      right: var(--gut);
+      bottom: calc(64px + env(safe-area-inset-bottom) + var(--s-4));
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      width: 56px;
+      height: 56px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--action);
+      color: #ffffff;
+      box-shadow: 0 10px 24px color-mix(in oklab, var(--p-ink) 28%, transparent);
+      cursor: pointer;
+    }
+    .fab:hover { background: color-mix(in oklab, var(--action) 88%, black); }
+    .fab svg { width: 24px; height: 24px; }
+
+    body.hoja-abierta { overflow: hidden; }
+    #lista-tareas { padding-bottom: calc(var(--s-9) + 40px); }
+  }
+
+  @keyframes hoja-subir {
+    from { transform: translateY(24px); opacity: 0.6; }
+    to { transform: none; opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .task-compose__sheet { animation: none; }
+  }
   .field { display: grid; gap: 6px; min-width: 0; }
   .field label { font-size: var(--t-label); font-weight: 500; color: var(--muted); }
   .input, .select {

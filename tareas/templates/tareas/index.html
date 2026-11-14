@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Tareas · Panel personal{% endblock %}
 {% block description %}Lista de tareas del panel personal, con prioridad, fecha límite y cambios por HTMX.{% endblock %}
@@ -14,9 +15,21 @@
     {% include "tareas/partials/_contadores.html" %}
   </div>
 
-  <div class="mt-8">
-    {% include "tareas/partials/_form_tarea.html" %}
+  <div class="task-compose" id="hoja-tarea" data-hoja-tarea>
+    <div class="task-compose__sheet" aria-labelledby="hoja-titulo">
+      <div class="task-compose__head">
+        <h2 id="hoja-titulo">Nueva tarea</h2>
+        <button class="task-compose__close" type="button" data-cerrar-hoja aria-label="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 4l10 10M14 4 4 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      {% include "tareas/partials/_form_tarea.html" %}
+    </div>
   </div>
+
+  <button class="fab" type="button" data-abrir-hoja aria-label="Añadir tarea" aria-expanded="false" aria-controls="hoja-tarea">
+    <svg aria-hidden="true"><use href="#icono-mas"></use></svg>
+  </button>
 
   <ul id="lista-tareas" class="task-list mt-6" aria-label="Tareas">
     {% for tarea in tareas %}
@@ -25,4 +38,8 @@
     {% include "tareas/partials/_vacio.html" %}
   </ul>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/tareas.js' %}" defer></script>
 {% endblock %}

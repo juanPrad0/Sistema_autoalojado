@@ -49,6 +49,7 @@ class TareasVistasTests(TestCase):
         self.assertContains(response, f'id="tarea-{tarea.pk}"')
         self.assertNotContains(response, "<html")
         self.assertContains(response, 'hx-swap-oob="outerHTML"')
+        self.assertEqual(response["HX-Trigger"], "tarea-creada")
 
     def test_crear_vacio_devuelve_el_formulario_con_error(self):
         response = self.client.post(
